@@ -4,7 +4,6 @@ namespace Drupal\graphql_webform\Plugin\GraphQL\Fields\Submission;
 
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Fields\FieldPluginBase;
-use Drupal\graphql_webform\GraphQL\WebformSubmissionOutputWrapper;
 use Drupal\graphql_webform\GraphQL\WebformSubmissionErrorWrapper;
 use GraphQL\Type\Definition\ResolveInfo;
 
@@ -13,24 +12,20 @@ use GraphQL\Type\Definition\ResolveInfo;
  *
  * @GraphQLField(
  *   secure = true,
- *   parents = {"WebformSubmissionOutput"},
- *   id = "webform_submission_output_errors",
- *   name = "errors",
- *   type = "[WebformSubmissionErrorWrapper]",
+ *   parents = {"WebformSubmissionErrorWrapper"},
+ *   id = "webform_submission_error_key",
+ *   name = "key",
+ *   type = "String",
  * )
  */
-class WebformSubmissionOutputErrors extends FieldPluginBase {
+class WebformSubmissionErrorKey extends FieldPluginBase {
 
   /**
    * {@inheritdoc}
    */
   public function resolveValues($value, array $args, ResolveContext $context, ResolveInfo $info) {
-    if ($value instanceof WebformSubmissionOutputWrapper) {
-      if ($errors = $value->getErrors()) {
-        foreach ($errors as $error) {
-          yield $error;
-        }
-      }
+    if ($value instanceof WebformSubmissionErrorWrapper) {
+      yield $value->getKey();
     }
   }
 

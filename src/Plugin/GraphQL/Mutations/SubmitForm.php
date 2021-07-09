@@ -5,6 +5,7 @@ namespace Drupal\graphql_webform\Plugin\GraphQL\Mutations;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\graphql\GraphQL\Execution\ResolveContext;
 use Drupal\graphql\Plugin\GraphQL\Mutations\MutationPluginBase;
+use Drupal\graphql_webform\GraphQL\WebformSubmissionErrorWrapper;
 use Drupal\graphql_webform\GraphQL\WebformSubmissionOutputWrapper;
 use Drupal\webform\WebformSubmissionForm;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -108,8 +109,14 @@ class SubmitForm extends MutationPluginBase implements ContainerFactoryPluginInt
       // Validate submission.
       $errors = WebformSubmissionForm::validateFormValues($webform_data);
 
-      if (!empty($errors)) {
-        return $this->resolveOutput(NULL, $errors);
+      $processed_errors = [];
+
+      foreach ($errors as $key => $error) {
+        $processed_errors []= new WebformSubmissionErrorWrapper($key, $error);
+      }
+
+      if (!empty($processed_errors)) {
+        return $this->resolveOutput(NULL, $processed_errors);
       }
 
       $webform_submission = WebformSubmissionForm::submitFormValues($webform_data);
